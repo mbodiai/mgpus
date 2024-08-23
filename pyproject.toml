@@ -1,0 +1,128 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mgpus"
+dynamic = ["version"]
+description = "List GPU processes and their memory usage"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "apache-2.0"
+keywords = []
+authors = [{name="mbodiai"}]
+classifiers = [
+"Development Status :: 4 - Beta",
+"Programming Language :: Python",
+"Programming Language :: Python :: 3.9",
+"Programming Language :: Python :: 3.10",
+"Programming Language :: Python :: 3.11",
+"Programming Language :: Python :: 3.12",
+"Programming Language :: Python :: Implementation :: CPython",
+"Programming Language :: Python :: Implementation :: PyPy",
+]
+
+dependencies = [
+"click",
+"psutil",
+"pynvml",
+"rich"
+]
+[project.optional-dependencies]
+[project.urls]
+Documentation = "https://github.com/mbodiai/mgpus#readme"
+Issues = "https://github.com/mbodiai/mgpus/issues"
+Source = "https://github.com/mbodiai/mgpus"
+
+[project.scripts]
+mgpus = "mgpus.main:cli"
+
+
+[tool.hatch.version]
+path = "mgpus/__about__.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+
+
+[tool.hatch.envs.default]
+python = "3.11"
+path = ".mgpus/envs/mgpus"
+dependencies = [
+"pytest",
+"pytest-mock",
+"pytest-asyncio",
+]
+
+[tool.hatch.envs.default.env-vars]
+
+[tool.hatch.envs.conda]
+type = "conda"
+python = "3.11"
+command = "conda"
+conda-forge = false
+environment-file = "environment.yml"
+prefix = ".venv/"
+
+[tool.hatch.envs.default.scripts]
+test = "pytest -vv --ignore third_party {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = ["- coverage combine", "coverage report"]
+cov = ["test-cov", "cov-report"]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12"]
+
+[tool.hatch.envs.types]
+dependencies = [
+"mypy>=1.0.0"
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:mgpus/ tests}"
+
+[tool.coverage.run]
+source_pkgs = ["mgpus", "tests"]
+branch = true
+parallel = true
+omit = ["mgpus/__about__.py"]
+
+[tool.coverage.paths]
+mgpus = ["mgpus/"]
+tests = ["tests"]
+
+[tool.coverage.report]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-unsafe-fixes = ["ALL"]
+select = [
+"A", "COM812", "C4", "D", "E", "F", "UP", "B", "SIM", "ISC", "N", "ANN", "ASYNC",
+"S", "T20", "RET", "SIM", "ARG", "PTH", "ERA", "PD", "I", "PLW",
+]
+ignore = [
+"D100", "D101", "D104", "D106", "ANN101", "ANN102", "ANN003", "UP009", "ANN204",
+"B026", "ANN001", "ANN401", "ANN202", "D107", "D102", "D103", "E731", "UP006",
+"UP035", "ANN002",
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/{tests,docs}/*" = ["ALL"]
+"**__init__.py" = ["F401"]
